@@ -127,6 +127,15 @@ public class Loader : MonoBehaviour
             ManagerUI.MUI.UpdateProgress(currCharIndex / data.Length);
         }
 
+        //Process last line
+        currCharIndex += lineEndingLength;
+        if (currEntryContainedQuote)
+            currEntry = currEntry.Substring(1, currEntry.Length - 2);
+        currLineEntries.Add(currEntry);
+        currEntry = "";
+        currEntryContainedQuote = false;
+        ProcessSOTG.PS.ProcessLineFromCSV(currLineEntries, currLineIndex);
+
         onCompleted(null);
     }
 }

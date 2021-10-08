@@ -7,19 +7,35 @@ public class ProcessSOTG : MonoBehaviour
 
     private List<Team> teams;
 
-    private struct Team
+    public struct Team
     {
         public string name;
-        public List<int> scores;
+        public List<Score> scores;
 
         public float Avg()
         {
             int sum = 0;
             for (int i = 0; i < scores.Count; i++)
             {
-                sum += scores[i];
+                sum += scores[i].Sum();
             }
             return (float)sum / scores.Count;
+        }
+    }
+
+    public struct Score
+    {
+        public string time;
+        public string scoringTeam;
+        public int[] partials;
+        public string comment;
+
+        public int Sum()
+        {
+            int s = 0;
+            foreach (int p in partials)
+                s += p;
+            return s;
         }
     }
 
@@ -40,36 +56,32 @@ public class ProcessSOTG : MonoBehaviour
 
     public void ProcessLineFromCSV(List<string> currLineElements, int currLineIndex)
     {
+        if (currLineIndex == 0) return; //Ignore Header
+
         string currentTerm = string.Empty;
         string currentTeam = string.Empty;
 
         if (currLineElements.Count > 1)
         {
-            //Ignore Header
-            if (currLineIndex > 1)
-                for (int columnIndex = 0; columnIndex < currLineElements.Count; columnIndex++)
+            currentTeam = currLineElements[2];
+
+            if (!TeamExists(currentTeam))
+            {
+                teams.Add(new Team
                 {
-                    currentTerm = currLineElements[columnIndex];
+                    name = currentTeam,
+                    scores = new List<Score>()
+                });
+            }
 
-                    switch (columnIndex)
-                    {
-                        case 2:
-                            currentTeam = currentTerm;
-
-                            if (!TeamExists(currentTeam))
-                            {
-                                teams.Add(new Team
-                                {
-                                    name = currentTeam,
-                                    scores = new List<int>()
-                                });
-                            }
-                            break;
-                        case 8:
-                            teams[TeamIndex(currentTeam)].scores.Add(int.Parse(currentTerm));
-                            break;
-                    }
-                }
+            Team t = teams[TeamIndex(currentTeam)];
+            t.scores.Add(new Score()
+            {
+                time = currLineElements[0],
+                scoringTeam = currLineElements[1],
+                partials = new int[] { int.Parse(currLineElements[3]), int.Parse(currLineElements[4]), int.Parse(currLineElements[5]), int.Parse(currLineElements[6]), int.Parse(currLineElements[7]) },
+                comment = currLineElements[9]
+            });
         }
         else
         {
@@ -103,8 +115,8 @@ public class ProcessSOTG : MonoBehaviour
         return teams.Count;
     }
 
-    public string GetTeam(int _index)
+    public Team GetTeam(int _index)
     {
-        return teams[_index].name + " " + teams[_index].Avg().ToString("0.00");
+        return teams[_index];
     }
 }
