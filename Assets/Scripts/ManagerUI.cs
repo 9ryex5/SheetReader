@@ -40,7 +40,19 @@ public class ManagerUI : MonoBehaviour
         UpdateProgress(0);
     }
 
-    public void ButtonPullData()
+    public void PullDataMale()
+    {
+        PlayerPrefs.SetString("sheetID", "10xZ0xJFHJXmz8beuqVujDykHOSFW8kdBsGs4eiUCdlI");
+        PullData();
+    }
+
+    public void PullDataFemale()
+    {
+        PlayerPrefs.SetString("sheetID", "1YuiW7Me0TFb03mFA_vgByDawX14HWLUlF-umhg3oJDA");
+        PullData();
+    }
+
+    public void PullData()
     {
         FlushMenu();
         ProcessSOTG.PS.ClearData();
